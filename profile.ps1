@@ -21,18 +21,36 @@ function git-unset-proxy {
     git config --global --unset http.proxy
 }
 
-# for updateing "md-to-pdf" command 
-function update-md-to-pdf {
-    $MDF="C:\Users\moyas\md-to-pdf"
-    cd 'C:\Users\moyas\md-to-pdf'
-    git pull
-    npm run build
+# pip proxy setting
+function pip-set-proxy{
+    sudo pip install --proxy http://wwwproxy.kanazawa-it.ac.jp:8080
 }
 
-# gcc command alias
-function gcc {
-    gcc -finput-charset=utf-8 -fexec-charset=cp932
+# npm proxy setting
+function npm-set-proxy{
+    npm config set proxy http://wwwproxy.kanazawa-it.ac.jp:8080
+    # npm config set proxy https://wwwproxy.kanazawa-it.ac.jp:8080
 }
+function npm-unset-proxy{
+    npm config delete proxy
+}
+
+# for updateing "md-to-pdf" command 
+## START ##
+# function update-md-to-pdf {
+#     $MDF="C:\Users\moyas\md-to-pdf"
+#     cd 'C:\Users\moyas\md-to-pdf'
+#     git pull
+#     npm run build
+# }
+
+# gcc command alias
+# Set-Alias -Name gcc -Value "gcc -finput-charset=utf-8 -fexec-charset-cp932 -g"
+# function gcc{
+#     param()
+#     gcc.exe -finput-charset=utf-8 -fexec-charset=cp932 -g
+# }
+# Set-Alias -Name gcc -Value 'gcc.exe -finput-charset=utf-8 -fexec-charset=cp932 -g'
 
 # Cammand Aliases
 Set-Alias -Name touch -Value New-Item
@@ -61,7 +79,11 @@ function prompt {
 }
 
 # java command alias
-Set-Alias -Name javac -Value "javac.exe -encoding utf-8"
+function javac {
+    javac.exe -encoding utf-8 $Args[0]
+}
+
+# Set-Alias -Name "javac" -Value "javac.exe -encoding utf-8"
 # powershell completion for arduino-cli                          -*- shell-script -*-
 
 # 以下のコードはarduino-cli.exeによって生成されたコマンド補完機能を提供するものである。
@@ -291,3 +313,29 @@ Register-ArgumentCompleter -CommandName 'arduino-cli' -ScriptBlock {
 }
 
 ## ここまでがarduino-cli.exeの設定である
+
+# powershell profile
+# powershell -File C:\Users\moyas\OneDrive\ドキュメント\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
+
+chcp 932
+
+# Set-Alias -Name gcc -Value "gcc -finput-charset=utf-8 -fexec-charset-cp932 -g"
+
+# virtualenvが使いにくいのでその起動用のスクリプト
+
+function venv-activate {
+    if (Test-Path venv) {
+        ./venv/Scripts/activate.ps1
+    } else {
+        virtualenv venv
+        ./venv/Scripts/activate.ps1
+    }
+}
+
+# virtualenv aliases
+function va {
+    venv-activate
+}
+function da {
+    deactivate
+}
