@@ -23,7 +23,11 @@ function git-unset-proxy {
 
 # pip proxy setting
 function pip-set-proxy{
-    sudo pip install --proxy http://wwwproxy.kanazawa-it.ac.jp:8080
+    pip config set global.proxy http://wwwproxy.kanazawa-it.ac.jp:8080
+}
+
+function pip-unset-proxy{
+    pip config unset global.proxy
 }
 
 # npm proxy setting
@@ -323,18 +327,19 @@ chcp 932
 
 # virtualenvが使いにくいのでその起動用のスクリプト
 
-function venv-activate {
+function activate-venv {
     if (Test-Path venv) {
-        ./venv/Scripts/activate.ps1
+        ./venv/Scripts/Activate.ps1
     } else {
-        virtualenv venv
-        ./venv/Scripts/activate.ps1
+        # virtualenv venv
+        python -m venv venv
+        ./venv/Scripts/Activate.ps1
     }
 }
 
 # virtualenv aliases
 function va {
-    venv-activate
+    activate-venv
 }
 function da {
     deactivate
