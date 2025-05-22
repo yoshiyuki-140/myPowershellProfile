@@ -7,9 +7,13 @@
 # }
 
 # get-childitem command alias
+function la {
+    Get-ChildItem -Force
+}
+
 function ll {
     param ()  
-    Get-ChildItem -Force
+    Get-ChildItem | ForEach-Object { $_.Name }
 }
 
 # git proxy setting  
@@ -37,6 +41,16 @@ function npm-set-proxy{
 }
 function npm-unset-proxy{
     npm config delete proxy
+}
+
+function set-proxy-variable{
+    $env:HTTP_PROXY = "http://wwwproxy.kanazawa-it.ac.jp:8080"
+    $env:HTTPS_PROXY = "http://wwwproxy.kanazawa-it.ac.jp:8080"
+}
+
+function unset-proxy-variable {
+    Remove-Item -Path Env:\HTTP_PROXY
+    Remove-Item -Path Env:\HTTPS_PROXY
 }
 
 # for updateing "md-to-pdf" command 
@@ -321,21 +335,35 @@ Register-ArgumentCompleter -CommandName 'arduino-cli' -ScriptBlock {
 # powershell profile
 # powershell -File C:\Users\moyas\OneDrive\ドキュメント\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
 
-chcp 932
+# chcp 932
+chcp 65001
+
 
 # Set-Alias -Name gcc -Value "gcc -finput-charset=utf-8 -fexec-charset-cp932 -g"
 
 # virtualenvが使いにくいのでその起動用のスクリプト
 
-function activate-venv {
-    if (Test-Path venv) {
-        ./venv/Scripts/Activate.ps1
+# pipが最新かどうか判定する関数,最新の時はTrueを返す
+
+function Is-PipUpToDate {
+    $currentPipVersion = pip --version | Out-String
+    $latestPipVersion = (pip list -o | Select-Object -First 1).Version
+
+    if ($currentPipVersion -match $latestPipVersion) {
+        return $true
     } else {
-        # virtualenv venv
-        python -m venv venv
-        ./venv/Scripts/Activate.ps1
+        Write-Host "pip is old version. Installed version: $currentPipVersion, Latest version: $latestPipVersion"
+        return $false
     }
 }
+
+function activate-venv {
+    if (-Not (Test-Path .\.venv)) {
+        uv venv
+    }
+    .\.venv\Scripts\activate
+}
+
 
 # virtualenv aliases
 function va {
@@ -344,3 +372,33 @@ function va {
 function da {
     deactivate
 }
+
+# set proxy git and pip
+
+function set-proxy {
+    git-set-proxy
+    pip-set-proxy
+    npm-set-proxy
+    set-proxy-variable
+}
+
+function unset-proxy {
+    git-unset-proxy
+    pip-unset-proxy
+    npm-unset-proxy
+    unset-proxy-variable
+}
+
+# Install from PowerShell Gallery
+# Install-Module DockerCompletion -Scope CurrentUser
+# Import
+Import-Module DockerCompletion
+
+# Pythonのエンコーディングをutf-8に指定
+$env:PYTHONIOENCODING = "utf-8"
+
+# oh-my-poshの設定
+# oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH/craver.omp.json" | Invoke-Expression
+
+# Powershellの出力値をutf-8に修正
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
